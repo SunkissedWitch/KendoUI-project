@@ -12,10 +12,9 @@ import {
 } from "@progress/kendo-react-form";
 
 import { Error } from "@progress/kendo-react-labels";
-import { getter } from "@progress/kendo-react-common";
 import { Checkbox, Input } from "@progress/kendo-react-inputs";
 
-import { nameValidator, userNameValidator, nameRegex, formValidator } from "../../services/validators"
+import { nameValidator, userNameValidator, checkboxValidator, formValidator } from "../../services/validators"
 
 
 
@@ -33,38 +32,23 @@ const ValidatedInput = (fieldRenderProps: FieldRenderProps) => {
 	);
 };
 
+const ValidatedCheckbox = (fieldRenderProps: FieldRenderProps) => {
+	const { validationMessage, visited, value, ...others } = fieldRenderProps;
+	return (
+		<div>
+			<Checkbox value={undefined} {...others} />
+			{visited && validationMessage && <Error>{validationMessage}</Error>}
+		</div>
+	);
+};
+
+
 function NewUserDialog(props: IProps) {
 	const { dialogClose } = props;
 
 	const handleSubmit = (dataItem: { [name: string]: any }) => {
-		const usernameL = dataItem.user_name?.length;
-		const firstnameL = dataItem.first_name?.length;
-		const lastnameL = dataItem.last_name?.length;
-		const firstAndLastNameL = firstnameL + lastnameL;
-		if( usernameL > 15 || firstnameL > 25 || lastnameL > 25 || firstAndLastNameL > 40 ) {
-			console.log("error");
-			return;
-		}
-		// if (dataItem.user_name.length > 15) {
-		// 	console.log("error 15");
-		// 	return ;
-		// }
-		// if (dataItem.first_name.length > 25) {
-		// 	console.log("error name 25");
-		// 	return ;
-		// }
-		// if (dataItem.last_name.length > 25) {
-		// 	console.log("error last name 25");
-		// 	return ;
-		// }
-		// if ((dataItem.last_name.length + dataItem.first_name.length) > 40) {
-		// 	console.log("error 40");
-		// 	return ;
-		// }
     console.log(JSON.stringify(dataItem, null, 2))
 	}
-
-		
 
   return (
     <>
@@ -113,11 +97,12 @@ function NewUserDialog(props: IProps) {
 								/>
 							</div>
 
-							<div className="mb-3">
+							<div className="my-3">
 								<Field
 									name={"enabled"}
+									component={ValidatedCheckbox}
 									label={"Enabled"}
-									component={Checkbox}
+									validator={checkboxValidator}	
 								/>
 							</div>
 						</fieldset>
