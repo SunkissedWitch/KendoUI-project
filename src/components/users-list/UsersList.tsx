@@ -46,19 +46,20 @@ function DataGrid <AppProps>() {
     }
   );
 
+
   const rowRender = (
-    trElement: ReactElement<HTMLTableRowElement>,
+    trElement: React.ReactElement<HTMLTableRowElement>, 
     props: GridRowProps
-  ) => {
-    const defaultColor = { backgroundColor: "default" };
+    ) => {
+    const available = !props.dataItem.enabled;
+    const white = { backgroundColor: "#fff" };
     const red = { backgroundColor: "rgb(243, 23, 0, 0.32)" };
-    const trProps: any = { style: props.dataItem.enabled ? defaultColor : red };
-    return cloneElement(
+    const trProps: any = { style: available ? red : white };
+    return React.cloneElement(
       trElement,
       { ...trProps },
-      trElement.props.children
-    );
-  };
+      trElement.props.children);
+}
 
  const handleGridDataStateChange = (e: any ) => {
     setState({...state, gridDataState: e.dataState});
@@ -78,6 +79,7 @@ function DataGrid <AppProps>() {
         windowVisible: false
     });
   }
+  console.log("state", state);
 
   return (
     <div className="App">
@@ -126,7 +128,9 @@ const checkboxColumn = (props: any) => {
     // console.log("dataItem", props.dataItem, "field", props.field)
     const id = props.dataItem[props.field];
     const enabled = id ? "Yes" : "No";
-    const color = id ? "" : '';
+
+    // setUsers(...users, users[id] )
+
 
     return (
         <td>
