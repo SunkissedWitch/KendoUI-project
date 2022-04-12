@@ -1,59 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { StoreContext } from '../../App';
 import { Link, useNavigate } from "react-router-dom";
 import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
+import { addUser, fetchUser } from '../../services/users';
 
 import {
   Form,
   Field,
   FormElement,
-  FieldRenderProps,
-  FormRenderProps,
-  FormValidatorType,
+  FormRenderProps
 } from "@progress/kendo-react-form";
 
-import { Error } from "@progress/kendo-react-labels";
-import { Checkbox, Input } from "@progress/kendo-react-inputs";
-
 import { nameValidator, userNameValidator, checkboxValidator, formValidator } from "../../services/validators"
-
-
+import { ValidatedInput, ValidatedCheckbox } from '../users-list/FormComponents';
 
 interface IProps {
 	dialogClose: () => void;
 }
 
-const ValidatedInput = (fieldRenderProps: FieldRenderProps) => {
-	const { validationMessage, visited, ...others } = fieldRenderProps;
-	return (
-		<div>
-			<Input {...others} />
-			{visited && validationMessage && <Error>{validationMessage}</Error>}
-		</div>
-	);
-};
-
-const ValidatedCheckbox = (fieldRenderProps: FieldRenderProps) => {
-	const { validationMessage, visited, value, ...others } = fieldRenderProps;
-	return (
-		<div>
-			<Checkbox value={undefined} {...others} />
-			{visited && validationMessage && <Error>{validationMessage}</Error>}
-		</div>
-	);
-};
-
 
 function NewUserDialog(props: IProps) {
+	const store: any = useContext(StoreContext);
 	const { dialogClose } = props;
 
-	const handleSubmit = (dataItem: { [name: string]: any }) => {
-    console.log(JSON.stringify(dataItem, null, 2))
+
+	const unique = async (userName: string) => {
+		const result = await fetchUser(userName);
+		console.log( "fetchUser", result )
+		if (result) {
+			console.log("not unique");
+			return false;
+		}
+		return true;
+	}
+
+	const handleSubmit = async (dataItem: { [name: string]: any }) => {
+    console.log(JSON.stringify(dataItem, null, 2));
+		const isUnique = await unique(dataItem.user_name);
+
+		if (isUnique) {
+			console.log("unique");
+			addUser(dataItem);
+			store.addUser(dataItem);
+			dialogClose();			
+		};
+
 	}
 
   return (
     <>
 			<Dialog title={"Add new user"} onClose={() => dialogClose()}>
 				<Form
+				initialValues={{enabled: undefined}}
 				onSubmit={handleSubmit}
 				validator={formValidator}
 				render={(formRenderProps: FormRenderProps) => (

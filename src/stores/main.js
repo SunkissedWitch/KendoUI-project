@@ -1,18 +1,23 @@
-class Users {
-    users = {};
+import { action, makeObservable, observable } from "mobx";
 
-    get() {
-        return this.users;
-    }
+class UsersStore {
+  users = [];
 
-    set(updatedUsers) {
-        this.users = {
-            ...this.users,
-            updatedUsers
-        }
-        return this.users;
-    }
+  setUsers(users) {
+    this.users = users;
+  }
 
+  addUser(user) {
+      this.users.push(user);
+  }
+
+  constructor() {
+    makeObservable(this, {
+      users: observable,
+      setUsers: action,
+      addUser: action,
+    });
+  }
 }
 
-export const UsersStore = new Users();
+export default UsersStore;

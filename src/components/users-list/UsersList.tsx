@@ -1,36 +1,19 @@
-// export const some= "some";
-// import { observer } from 'mobx';
-
-// const UsersList = observer(({UsersStore})) => {
-
-// }
-
-import React, { useState, useEffect, ReactElement, cloneElement } from 'react';
-import { fetchUser } from '../../services/users';
+import React, { useState, useEffect, useContext } from 'react';
+import { observer } from "mobx-react-lite";
+import { StoreContext } from '../../App';
+import { useNavigate } from "react-router-dom";
+import { fetchUsers } from '../../services/users';
 import { process, State } from '@progress/kendo-data-query';
 import { Grid, GridColumn, GridRowProps } from '@progress/kendo-react-grid';
-import { Window } from '@progress/kendo-react-dialogs/dist/npm/Window';
 
-interface AppProps {}
 interface AppState {
   gridDataState: State;
-  windowVisible: boolean;
-  gridClickedRow: any;
 }
 
-function DataGrid <AppProps>() {
-  const [users, setUsers] = useState([]);
+const DataGrid = observer(() => {
 
-  useEffect(() => {
-    fetchUser().then((data: any) => {
-      for (let user of data.users) {
-        user.last_login = new Date(user.last_login);
-        user.full_name = `${user.first_name} ${user.last_name}`;
-      }
-      console.log(data.users);
-      setUsers(data.users);
-    })
-  }, []);
+  const store: any = useContext(StoreContext);
+  const navigate = useNavigate();
 
   const [ state, setState ] = useState <AppState> (
     {
@@ -40,46 +23,48 @@ function DataGrid <AppProps>() {
         ],
         skip: 0,
         take: 10
-      },
-      windowVisible: false,
-      gridClickedRow: {},
+      }
     }
   );
 
+  useEffect(() => {
+    fetchUsers().then((data: any) => {
+
+      const formatedData = data.map( (item: any) => {
+        return { ...item,
+          last_login: new Date(item.last_login),
+          full_name: `${item.first_name} ${item.last_name}`,
+        }
+      })
+      store.setUsers(formatedData);
+    })
+  }, [state]);
+
 
   const rowRender = (
-    trElement: React.ReactElement<HTMLTableRowElement>, 
+    trElement: React.ReactElement<HTMLTableRowElement>,
     props: GridRowProps
-    ) => {
+  ) => {
     const available = !props.dataItem.enabled;
     const white = { backgroundColor: "#fff" };
     const red = { backgroundColor: "rgb(243, 23, 0, 0.32)" };
     const trProps: any = { style: available ? red : white };
+
     return React.cloneElement(
       trElement,
       { ...trProps },
-      trElement.props.children);
-}
+      trElement.props.children
+    );
+  };
 
  const handleGridDataStateChange = (e: any ) => {
     setState({...state, gridDataState: e.dataState});
   }
 
-  const handleGridRowClick = (e: {dataItem : object}) => {
-    setState({
-      ...state,
-        windowVisible: true,
-        gridClickedRow: e.dataItem
-    });
+  const handleGridRowClick = (e: {dataItem : {[key: string]: string}}) => {
+    const url = e.dataItem.user_name;
+    navigate (`/detail/${url}`)
   }
-
-  const closeWindow = (e: any) => {
-    setState({
-      ...state,
-        windowVisible: false
-    });
-  }
-  console.log("state", state);
 
   return (
     <div className="App">
@@ -87,7 +72,7 @@ function DataGrid <AppProps>() {
       <Grid
         rowRender={rowRender}
         onRowClick={handleGridRowClick}
-        data={process(users, state.gridDataState)}
+        data={process(store.users, state.gridDataState)}
         pageable={true}
         sortable={true}
         reorderable={true}
@@ -100,37 +85,13 @@ function DataGrid <AppProps>() {
         <GridColumn field="last_login" filterable={false} title="Last Login" format="{0:yyyy-MM-dd HH:mm:ss}" />
         <GridColumn field="enabled" title="Enabled" filterable={false} cell={checkboxColumn} />
       </Grid>
-      {state.windowVisible &&
-        <Window
-          title="Product Details"
-          onClose={closeWindow}
-          height={250}>
-          <dl style={{textAlign:"left"}}>
-            <dt>First Name</dt>
-            <dd>{state.gridClickedRow.first_name}</dd>
-            <dt>Last Name</dt>
-            <dd>{state.gridClickedRow.last_name}</dd>
-            <dt>Enabled</dt>
-            <dd>{state.gridClickedRow.enabled}</dd>
-          </dl>
-        </Window>
-      }
     </div>
   );
-}
-
-// interface IProps {
-//   dataItem: any;
-//   field: string;
-// }
+})
 
 const checkboxColumn = (props: any) => {
-    // console.log("dataItem", props.dataItem, "field", props.field)
     const id = props.dataItem[props.field];
     const enabled = id ? "Yes" : "No";
-
-    // setUsers(...users, users[id] )
-
 
     return (
         <td>

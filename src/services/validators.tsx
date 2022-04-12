@@ -9,12 +9,25 @@ export const nameValidator = (value: string) =>
       ? ""
       : "Please fill in the form using only a-Z and numeric symbols";
 
-export const userNameValidator = (value: string) => 
-  (value && value.length > 15) 
-    ? "Max length is 15 characters"
-    : nameRegex.test(value) 
-      ? ""
-      : "Please fill in the form using only a-Z and numeric symbols";	
+// export const userNameValidator = (value: string) => 
+//   (value && value.length > 15) 
+//     ? "Max length is 15 characters"
+//     : nameRegex.test(value) 
+//       ? ""
+//       : "Please fill in the form using only a-Z and numeric symbols";	
+
+
+export const userNameValidator = (value: string) => {
+  if (value && value.length > 15) {
+    return "Max length is 15 characters"
+  }
+  if (!nameRegex.test(value)) {
+    return "Please fill in the form using only a-Z and numeric symbols"
+  }
+
+}
+
+
 
 export const checkboxValidator: (value: any) => string = (value) =>
   value === undefined 
@@ -23,7 +36,6 @@ export const checkboxValidator: (value: any) => string = (value) =>
 
 
 export const formValidator = (values: any) => {
-  console.log(values);
   const {
     first_name: firstName, 
     last_name: lastName, 
@@ -70,6 +82,55 @@ export const formValidator = (values: any) => {
   return validation;
 };
 
+
+
+export const formWithValueValidator = (values: any) => {
+  console.log(values);
+
+  const {
+    first_name: firstName, 
+    last_name: lastName, 
+    enabled
+  } = values;
+
+  let validation: IValidation = {};
+
+  if(!nameRegex.test(firstName)) {
+    validation['first_name'] = "Please fill in the form using only a-Z and numeric symbols";
+  }
+
+  if(firstName?.length > 25) {
+    validation['first_name'] = "You can use maximum 25 characters in this field";
+  }
+
+  if(!nameRegex.test(lastName)) {
+    validation['last_name'] = "Please fill in the form using only a-Z and numeric symbols";
+  }
+
+  if(lastName?.length > 25) {
+    validation['last_name'] = "You can use maximum 25 characters in this field";
+  }
+
+  if(!firstName || !lastName || enabled === undefined) {
+    validation['VALIDATION_SUMMARY'] = "Please fill in the form";
+  }
+
+  if(`${firstName} ${lastName}`.length > 40) {
+    validation['first_name'] = "You can use maximum 25 characters in this field";
+    validation['last_name'] = "You can use maximum 25 characters in this field";
+    validation['VALIDATION_SUMMARY'] = "Your Full Name can be maximum 40 characters";
+  }
+
+  if ( enabled === undefined ) {
+    validation['enabled'] = "Please set the value";
+  }
+
+  if(!Object.keys(validation).length) {
+    return;
+  }
+
+  return validation;
+};
 // export const formValidatorOld = (values: any) => {
 
 //   const userName = userNameGetter(values);
