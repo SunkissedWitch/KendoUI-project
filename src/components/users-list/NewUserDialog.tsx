@@ -23,6 +23,8 @@ function NewUserDialog(props: IProps) {
 	const store: any = useContext(StoreContext);
 	const { dialogClose } = props;
 
+	const [errorState, setErrorState] = useState<boolean>(false);
+
 
 	const unique = async (userName: string) => {
 		const result = await fetchUser(userName);
@@ -42,8 +44,9 @@ function NewUserDialog(props: IProps) {
 			console.log("unique");
 			addUser(dataItem);
 			store.addUser(dataItem);
-			dialogClose();			
+			dialogClose();		
 		};
+		setErrorState(true);
 
 	}
 
@@ -67,9 +70,13 @@ function NewUserDialog(props: IProps) {
                   {formRenderProps.errors.VALIDATION_SUMMARY}
                 </div>
               )}
+							{errorState && (
+								<div className={"k-messagebox k-messagebox-error"}>This user name already exist</div>)
+								}
 							
 							<div className="mb-3">
 								<Field
+									onChange={() => {setErrorState(false)}}
 									name={"user_name"}
 									component={ValidatedInput}
 									label={"Username"}
@@ -115,7 +122,7 @@ function NewUserDialog(props: IProps) {
 							<button
 									type={"submit"}
 									className="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"
-									disabled={!formRenderProps.allowSubmit}
+									disabled={!formRenderProps.allowSubmit || errorState}
 								>
 									Submit
 								</button>
