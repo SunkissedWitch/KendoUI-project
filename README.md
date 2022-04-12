@@ -1,46 +1,33 @@
-# Getting Started with Create React App
+Application will be comprised of two pages and a dialog:
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<b>UsersList</b>
 
-## Available Scripts
+This page will contain datagrid with all users available from API.
+Columns:
+1) Username (string)
+2) FullName (string)
+3) LastLogin (DateTime)
+4) Enabled (boolean)
 
-In the project directory, you can run:
+Datagrid should be sortable by all fields and filterable by Username (search). 
+LastLogin should be formatted to human friendly format and Enabled should be represented as "Yes"/"No" text.
+Rows with Enabled set to "No" should be colored red.
 
-### `npm start`
+<b>NewUserDialog</b>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+This dialog is activated using "New user" button - placement of this button is up to you.
+Dialog should contain validated form with fields:
+1) Username - max. 15 characters, only alphanumeric characters, non-empty, unique, case insensitive
+2) FirstName, LastName - together max. 40 characters, both non-empty, each has max. 25 characters
+3) Enabled - tri-state checkbox, must be specified ("Yes"/"No" values)
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Username uniqueness should be validated locally using data in datagrid with all users. FullName is combination of FirstName and LastName. Each can be 25 chars long, but together can not exceed 40 chars - you have to validate, that these fields are valid on their own and combined.
 
-### `npm test`
+<b>UserDetail</b>
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+This page contains details of selected user. Fields FirstName, LastName and Enabled are editable.
 
-### `npm run build`
+### API
+You do not have to develop any backend functionality. As your data source create in-memory mock API. Your API mock methods should contain some delay (~ 1 second) to simulate real server delays.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+All your API calls should be centralized in one place so it is easier to add error handling, HTTP request/response handling, security token handling etc.
