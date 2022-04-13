@@ -1,4 +1,4 @@
-import { IValidation } from '../services/interfaces'
+import { IValidation, IUser } from '../services/interfaces'
 
 export const nameRegex: RegExp = new RegExp(/^[a-z0-9]+$/i);
 
@@ -9,33 +9,21 @@ export const nameValidator = (value: string) =>
       ? ""
       : "Please fill in the form using only a-Z and numeric symbols";
 
-// export const userNameValidator = (value: string) => 
-//   (value && value.length > 15) 
-//     ? "Max length is 15 characters"
-//     : nameRegex.test(value) 
-//       ? ""
-//       : "Please fill in the form using only a-Z and numeric symbols";	
+export const userNameValidator = (value: string) => 
+  (value && value.length > 15) 
+    ? "Max length Username is 15 characters"
+    : nameRegex.test(value) 
+      ? ""
+      : "Please fill in the form using only a-Z and numeric symbols";	
 
 
-export const userNameValidator = (value: string) => {
-  if (value && value.length > 15) {
-    return "Max length is 15 characters"
-  }
-  if (!nameRegex.test(value)) {
-    return "Please fill in the form using only a-Z and numeric symbols"
-  }
-
-}
-
-
-
-export const checkboxValidator: (value: any) => string = (value) =>
+export const checkboxValidator: (value: boolean | undefined) => string = (value) =>
   value === undefined 
   ? "Checkbox is required" 
   : "";
 
 
-export const formValidator = (values: any) => {
+export const formValidator = (values: IUser) => {
   const {
     first_name: firstName, 
     last_name: lastName, 
@@ -82,10 +70,9 @@ export const formValidator = (values: any) => {
   return validation;
 };
 
+// * Form validator for use at UserDetail.tsx component
 
-
-export const formWithValueValidator = (values: any) => {
-  console.log(values);
+export const formWithValueValidator = (values: IUser) => {
 
   const {
     first_name: firstName, 
@@ -131,48 +118,3 @@ export const formWithValueValidator = (values: any) => {
 
   return validation;
 };
-// export const formValidatorOld = (values: any) => {
-
-//   const userName = userNameGetter(values);
-//   const firstName = firstNameGetter(values);
-//   const lastName = lastNameGetter(values);
-//   // const enabled = enabledGetter(values);
-
-//     if (userName && firstName && lastName) {
-//       if (userName.length <= 15 && firstName.length <= 25 && lastName.length <= 25) {
-//         if (`${firstName} ${lastName}`.length <= 40) {
-//           console.log("everything ok");
-//           return;
-//         }
-//       }
-//     }
-
-//     return {
-//       VALIDATION_SUMMARY: 
-//       !userName || !firstName || !lastName 
-//         ? "Please fill in the form" 
-//         : "" 
-//       ||
-//       `${firstName} ${lastName}`.length > 40 
-//         ? "Your Full Name can be maximum 40 characters" 
-//         : "",
-
-//       ["first_name"]: 
-//       !firstName 
-//       ? "" 
-//       : !nameRegex.test(firstName) 
-//         ? "Please fill in the form using only a-Z and numeric symbols" 
-//         : firstName.length < 25 
-//           ? "" 
-//           :	"You can use maximum 25 characters in this field",
-
-//       ["last_name"]: 
-//       !lastName 
-//       ? "" 
-//       : !nameRegex.test(lastName) 
-//         ? "Please fill in the form using only a-Z and numeric symbols" 
-//         : lastName.length < 25 
-//           ? "" 
-//           : "You can use maximum 25 characters in this field",
-//     };
-//   };

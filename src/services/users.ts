@@ -4,21 +4,36 @@ import { users as mockUsers } from '../stores/MockAPI';
 
 let users = mockUsers;
 
-
 // This sets the mock adapter on the default instance
 const mock = new MockAdapter(axios, { delayResponse: 1000 });
 
 // Mock any GET request to /users
 // arguments for reply are (status, data, headers)
-mock.onGet("/users").reply(200, users);
 
-// (/\/user\/\S+/)
+mock.onGet("/users").reply(200, users);
 
 mock.onGet(/\S+/).reply((config: any) => {
   const userName: string = config.url;
   const user = users.find( ({ user_name }) => user_name === userName );
 
   return [200, user];
+});
+
+mock.onPut("/edit_user").reply( (data: any): any => {
+  const updatedUser = JSON.parse(data.data);
+  const { first_name, last_name, enabled } = updatedUser;
+  const index = users.findIndex((obj => obj.user_name === updatedUser.user_name ))
+
+  users[index] = {
+    ...users[index],
+    first_name: first_name,
+    last_name: last_name,
+    enabled: enabled,
+  }
+  return [
+    204, 
+    users[index]
+  ]
 });
 
 
@@ -36,6 +51,7 @@ mock.onPost("/add_user").reply( (data: any): any => {
 
 
 const fetchUsers = async (): Promise<{}> => {
+
     const response = await axios.get("/users");
     
     return response.data;
@@ -43,18 +59,26 @@ const fetchUsers = async (): Promise<{}> => {
 
 
 const fetchUser = async (user: string | undefined): Promise<{}> => {
+
   const response = await axios.get(`${user}`);
-  console.log(`${user}`, response.data)
-  
+
   return response.data;
 }
 
 
-const addUser = async (JSONdata: {}): Promise<{}> => {
+const addUser = async (url: string, JSONdata: {}): Promise<{}> => {
   
-  const response = await axios.post("/add_user", JSONdata);
-  console.log("addUser", response.data);
+  const response = await axios.post(url, JSONdata);
+ 
   return response;
 }
 
-export { addUser, fetchUser, fetchUsers };
+
+const editUser = async (url: string, JSONdata: {}): Promise<{}> => {
+  
+  const response = await axios.put(url, JSONdata);
+
+  return response;
+}
+
+export { addUser, fetchUser, fetchUsers, editUser };

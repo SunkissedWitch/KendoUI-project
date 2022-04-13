@@ -1,18 +1,16 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { StoreContext } from '../../App';
-import { Link, useNavigate } from "react-router-dom";
-import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
 import { addUser, fetchUser } from '../../services/users';
-
+import { Dialog, DialogActionsBar } from "@progress/kendo-react-dialogs";
 import {
   Form,
   Field,
   FormElement,
   FormRenderProps
 } from "@progress/kendo-react-form";
-
 import { nameValidator, userNameValidator, checkboxValidator, formValidator } from "../../services/validators"
 import { ValidatedInput, ValidatedCheckbox } from '../users-list/FormComponents';
+
 
 interface IProps {
 	dialogClose: () => void;
@@ -23,30 +21,29 @@ function NewUserDialog(props: IProps) {
 	const store: any = useContext(StoreContext);
 	const { dialogClose } = props;
 
-	const [errorState, setErrorState] = useState<boolean>(false);
+	const [ errorState, setErrorState ] = useState<boolean>(false);
 
 
-	const unique = async (userName: string) => {
+	const checkIsUnique = async (userName: string) => {
 		const result = await fetchUser(userName);
-		console.log( "fetchUser", result )
-		if (result) {
-			console.log("not unique");
-			return false;
-		}
-		return true;
+
+		return !result;
 	}
 
 	const handleSubmit = async (dataItem: { [name: string]: any }) => {
-    console.log(JSON.stringify(dataItem, null, 2));
-		const isUnique = await unique(dataItem.user_name);
+    // console.log(JSON.stringify(dataItem, null, 2));
+		const isUnique = await checkIsUnique(dataItem.user_name);
 
 		if (isUnique) {
-			console.log("unique");
-			addUser(dataItem);
+			addUser("/add_user", dataItem);
 			store.addUser(dataItem);
-			dialogClose();		
+			store.isLoading(false);
+			dialogClose();
 		};
-		setErrorState(true);
+
+		if (!isUnique) {
+			setErrorState(true)
+		};
 
 	}
 
@@ -70,13 +67,13 @@ function NewUserDialog(props: IProps) {
                   {formRenderProps.errors.VALIDATION_SUMMARY}
                 </div>
               )}
-							{errorState && (
-								<div className={"k-messagebox k-messagebox-error"}>This user name already exist</div>)
-								}
+							{errorState &&
+								<div className={"k-messagebox k-messagebox-error"}>This Username already exist</div>
+							}
 							
 							<div className="mb-3">
 								<Field
-									onChange={() => {setErrorState(false)}}
+									onChange={() => setErrorState(false)}
 									name={"user_name"}
 									component={ValidatedInput}
 									label={"Username"}
@@ -120,12 +117,12 @@ function NewUserDialog(props: IProps) {
 								No
 							</button>
 							<button
-									type={"submit"}
-									className="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"
-									disabled={!formRenderProps.allowSubmit || errorState}
-								>
-									Submit
-								</button>
+								type={"submit"}
+								className="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"
+								disabled={!formRenderProps.allowSubmit || errorState}
+							>
+								Submit
+							</button>
 						</DialogActionsBar>
 					</FormElement>
 				)}

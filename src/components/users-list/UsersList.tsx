@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { observer } from "mobx-react-lite";
 import { StoreContext } from '../../App';
-import { useNavigate } from "react-router-dom";
-import { fetchUsers } from '../../services/users';
+import { useNavigate, NavigateFunction } from "react-router-dom";
+import { fetchAndFormatGridData } from '../../services/helpers'
 import { process, State } from '@progress/kendo-data-query';
 import { Grid, GridColumn, GridRowProps } from '@progress/kendo-react-grid';
+import { loadingPanel } from '../../services/constants';
 
 interface AppState {
   gridDataState: State;
@@ -13,7 +14,8 @@ interface AppState {
 const DataGrid = observer(() => {
 
   const store: any = useContext(StoreContext);
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
+  const loading = store.load;
 
   const [ state, setState ] = useState <AppState> (
     {
@@ -27,18 +29,11 @@ const DataGrid = observer(() => {
     }
   );
 
-  useEffect(() => {
-    fetchUsers().then((data: any) => {
 
-      const formatedData = data.map( (item: any) => {
-        return { ...item,
-          last_login: new Date(item.last_login),
-          full_name: `${item.first_name} ${item.last_name}`,
-        }
-      })
-      store.setUsers(formatedData);
-    })
-  }, [state]);
+  useEffect(() => {
+    fetchAndFormatGridData().then(
+      data => store.setUsers(data)).then(() => store.isLoading(true))
+  }, []);
 
 
   const rowRender = (
@@ -48,7 +43,7 @@ const DataGrid = observer(() => {
     const available = !props.dataItem.enabled;
     const white = { backgroundColor: "#fff" };
     const red = { backgroundColor: "rgb(243, 23, 0, 0.32)" };
-    const trProps: any = { style: available ? red : white };
+    const trProps: {} = { style: available ? red : white };
 
     return React.cloneElement(
       trElement,
@@ -68,6 +63,7 @@ const DataGrid = observer(() => {
 
   return (
     <div className="App">
+      {!loading && loadingPanel}
 
       <Grid
         rowRender={rowRender}

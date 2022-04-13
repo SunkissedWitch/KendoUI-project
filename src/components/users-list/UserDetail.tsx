@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { fetchUser } from '../../services/users';
+import { NavigateFunction, useNavigate, useParams } from "react-router-dom";
+import { fetchUser, editUser } from '../../services/users';
+import { observer } from "mobx-react-lite";
 import {
   Form,
   Field,
@@ -8,13 +9,18 @@ import {
   FormRenderProps,
 } from "@progress/kendo-react-form";
 import { ValidatedInput, ValidatedCheckbox }from '../users-list/FormComponents';
-import { nameValidator, checkboxValidator, formWithValueValidator } from "../../services/validators"
+import { nameValidator, checkboxValidator, formWithValueValidator } from "../../services/validators";
+import { loadingPanel } from '../../services/constants';
+import { IUser } from '../../services/interfaces';
 
-const UserDetail = () => {
+
+const UserDetail = observer (() => {
   const { user } = useParams();
-  const navigate = useNavigate();
+  const navigate: NavigateFunction = useNavigate();
 
-  const [ currentUser, setCurrentUser ] = useState({
+  const [ loaded, setLoaded ] = useState <boolean>(false);
+
+  const [ currentUser, setCurrentUser ] = useState <IUser>({
     user_name: "",
     first_name: "",
     last_name: "",
@@ -24,26 +30,27 @@ const UserDetail = () => {
   useEffect( () => {
     
     const fetch = async () => {
-      const userData: any = await fetchUser(user);  
-      console.log("userData", userData)
+      const userData: any = await fetchUser(user);
       setCurrentUser(userData); 
+      setLoaded(true);
     } 
     fetch();
     
   }, [])
 
-  console.log("currentUser", currentUser);
-
-  const { user_name, first_name, last_name, enabled } = currentUser;
+  const { user_name } = currentUser;
  
   const handleSubmit = (dataItem: { [name: string]: any }) => {
-    console.log(JSON.stringify(dataItem, null, 2));
-    
+    // console.log(JSON.stringify(dataItem, null, 2));
+    editUser("/edit_user", dataItem);
+    navigate('/');
 	}
 
-  
   return(
     <div className="centered">
+      <h2>Edit User</h2>
+      {!loaded && loadingPanel}
+
       <Form
         initialValues={currentUser}
         key={JSON.stringify(currentUser)}
@@ -112,6 +119,6 @@ const UserDetail = () => {
     </div> 
   )
 
-}
+})
 
 export default UserDetail;
