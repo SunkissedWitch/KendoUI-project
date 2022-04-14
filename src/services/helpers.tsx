@@ -2,7 +2,7 @@ import { fetchUsers } from '../services/users';
 
 export const fetchAndFormatGridData = async () => {
 
-  return await fetchUsers().then((data: any) => {
+  const result = await fetchUsers().then((data: any) => {
 
     const formatedData = data.map( (item: any) => {
       return { ...item,
@@ -13,4 +13,5 @@ export const fetchAndFormatGridData = async () => {
 
     return formatedData;
   })
+  return result;
 }
