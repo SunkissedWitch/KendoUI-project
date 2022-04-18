@@ -18,6 +18,8 @@ import {
   ValidatedInput,
   ValidatedCheckbox,
 } from "../users-list/FormComponents";
+import { ButtonSubmit } from "./ButtonSubmit";
+import { ButtonSubmitDisabled } from "./ButtonSubmitDisabled";
 
 interface IProps {
   dialogClose: () => void;
@@ -121,13 +123,9 @@ function NewUserDialog(props: IProps) {
                 >
                   No
                 </button>
-                <button
-                  type={"submit"}
-                  className="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"
-                  disabled={!formRenderProps.allowSubmit || errorState}
-                >
-                  Submit
-                </button>
+                {!formRenderProps.allowSubmit || errorState
+                  ? <ButtonSubmitDisabled />
+                  : <ButtonSubmit />}
               </DialogActionsBar>
             </FormElement>
           )}

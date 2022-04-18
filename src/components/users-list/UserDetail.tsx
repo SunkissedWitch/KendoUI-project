@@ -18,6 +18,8 @@ import {
   formWithValueValidator,
 } from "../../services/validators";
 import { loadingPanel } from "./loadingPanel";
+import { ButtonSubmit } from "./ButtonSubmit";
+import { ButtonSubmitDisabled } from "./ButtonSubmitDisabled";
 import { IUser } from "../../services/interfaces";
 
 const UserDetail = observer(() => {
@@ -98,20 +100,18 @@ const UserDetail = observer(() => {
                 />
               </div>
             </fieldset>
-
-            <button
-              className="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"
-              onClick={() => navigate("/")}
-            >
-              Cancel
-            </button>
-            <button
-              type={"submit"}
-              className="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"
-              disabled={!formRenderProps.allowSubmit}
-            >
-              Submit
-            </button>
+            
+            <div className="k-dialog-buttongroup k-hstack k-justify-content-stretch">
+              <button
+                className="k-button k-button-md k-rounded-md k-button-solid k-button-solid-base"
+                onClick={() => navigate("/")}
+              >
+                Cancel
+              </button>
+              {!formRenderProps.allowSubmit 
+              ? <ButtonSubmitDisabled />
+              : <ButtonSubmit />}
+            </div>
           </FormElement>
         )}
       />

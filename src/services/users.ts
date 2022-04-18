@@ -50,18 +50,33 @@ const fetchUsers = async (): Promise<{}> => {
 };
 
 const fetchUser = async (user: string): Promise<{}> => {
-  const response = await axios.get(user);
-  return response.data;
+  try {
+    const response = await axios.get(user);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    return {};
+  }
 };
 
 const addUser = async (url: string, JSONdata: {}): Promise<{}> => {
-  const response = await axios.post(url, JSONdata);
-  return response;
+  try {
+    const response = await axios.post(url, JSONdata);
+    return response;
+  } catch (error) {
+    console.log(error);
+    return JSONdata;
+  }
 };
 
 const editUser = async (url: string, JSONdata: {}): Promise<{}> => {
-  const response = await axios.put(url, JSONdata);
-  return response;
+  try {
+    const response = await axios.put(url, JSONdata);
+    return response;
+  } catch (error) {
+    console.log(error);
+    return JSONdata;
+  }
 };
 
 export { addUser, fetchUser, fetchUsers, editUser };

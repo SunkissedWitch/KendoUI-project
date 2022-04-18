@@ -12,6 +12,6 @@ export const fetchAndFormatGridData = async () => {
     })
 
     return formatedData;
-  })
+  }).catch(error => console.log(error))
   return result;
 }

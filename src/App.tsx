@@ -4,6 +4,7 @@ import './App.css';
 import Home from './components/users-list/Home';
 import UserDetail from './components/users-list/UserDetail';
 import UsersStore from './stores/main';
+import { NoMatch } from './components/users-list/NoMatch';
 
 import {
   BrowserRouter,
@@ -21,6 +22,7 @@ function App () {
         <Routes>
           <Route path="/" element={<Home />} /> 
           <Route path='/detail/:user' element={<UserDetail />} />
+          <Route path="*" element={<NoMatch />} />
         </Routes>
       </BrowserRouter>
     </StoreContext.Provider>
