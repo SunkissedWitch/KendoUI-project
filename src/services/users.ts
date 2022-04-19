@@ -12,10 +12,10 @@ const mock = new MockAdapter(axios, { delayResponse: 1000 });
 
 mock.onGet("/users").reply(200, users);
 
-mock.onGet(/\S+/).reply((config: any) => {
-  const userName: string = config.url;
+mock.onGet(/detail\/\S+/).reply((config: any) => {
+  const url: string = config.url;
+  const [ , route, userName ] = url.split('/');
   const user = users.find(({ user_name }) => user_name === userName);
-
   return [200, user];
 });
 
@@ -51,7 +51,7 @@ const fetchUsers = async (): Promise<{}> => {
 
 const fetchUser = async (user: string): Promise<{}> => {
   try {
-    const response = await axios.get(user);
+    const response = await axios.get(`/detail/${user}`);
     return response.data;
   } catch (error) {
     console.log(error);
